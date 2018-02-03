@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from PyQt5 import Qt
 import sys
 import schedule
@@ -12,18 +14,21 @@ class Notify(object):
         self.title = title
         self.content = content
 
-    def job(self):
-        systemtray_icon = Qt.QSystemTrayIcon(self.app)
-        systemtray_icon.show()
-        systemtray_icon.showMessage(self.title, self.content)
+    def task(self):
+        system_tray_icon = Qt.QSystemTrayIcon(self.app)
+        system_tray_icon.show()
+        system_tray_icon.showMessage(self.title, self.content)
 
 
 class Notification(object):
 
-    def every(self, second, content):
+    @staticmethod
+    def every(interval, time_unit, content):
         app = Qt.QApplication(sys.argv)
         notify = Notify(app, "Notification", content)
-        schedule.every(second).seconds.do(notify.job)
+        schedule_timer = schedule.every(interval)
+        schedule_timer.unit = time_unit
+        schedule_timer.do(notify.task)
         while True:
             schedule.run_pending()
             time.sleep(1)
