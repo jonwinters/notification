@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 
 from PyQt5 import Qt
-import sys
+import sys, signal
 import schedule
 import time
 import fire
 from daemon import Daemon
+import os
+
+PID = '/tmp/schedule.pid'
+
 
 class Notify(object):
 
@@ -35,8 +39,8 @@ class Notification(object):
 
 class DaemonSchedule(Daemon):
 
-    def __init__ (self,schedule):
-        super(DaemonSchedule,self).__init__('/tmp/schedule.pid')
+    def __init__(self, schedule):
+        super(DaemonSchedule, self).__init__(PID)
         self.schedule = schedule
 
     def run(self):
@@ -45,5 +49,11 @@ class DaemonSchedule(Daemon):
             time.sleep(1)
 
 
+def signal_handler(signal, frame):
+    os.remove(PID)
+    sys.exit(0)
+
+
 if __name__ == '__main__':
+    signal.signal(signal.SIGINT, signal_handler)
     fire.Fire(Notification)
