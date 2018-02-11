@@ -5,7 +5,7 @@ import sys
 import schedule
 import time
 import fire
-
+from daemon import Daemon
 
 class Notify(object):
 
@@ -29,8 +29,19 @@ class Notification(object):
         schedule_timer = schedule.every(interval)
         schedule_timer.unit = time_unit
         schedule_timer.do(notify.task)
+        daemon = DaemonSchedule(schedule)
+        daemon.start()
+
+
+class DaemonSchedule(Daemon):
+
+    def __init__ (self,schedule):
+        super(DaemonSchedule,self).__init__('/tmp/schedule.pid')
+        self.schedule = schedule
+
+    def run(self):
         while True:
-            schedule.run_pending()
+            self.schedule.run_pending()
             time.sleep(1)
 
 
